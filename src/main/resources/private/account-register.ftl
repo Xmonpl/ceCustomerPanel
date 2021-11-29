@@ -77,7 +77,7 @@
                     <form id="register-form">
                         <h1 class="title">customer.CodeEira.eu.org - Register</h1>
                         <div id="notification"></div>
-                        <div class="field">
+                        <div class="field mt-6">
                             <p class="control has-icons-left has-icons-right">
                                 <input class="input" type="email" placeholder="E-mail" id="email" required>
                                 <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
@@ -194,9 +194,13 @@
                 alert("zarejestrowano");
             } else {
                 $('#notification').empty();
-                $('#notification').append("<article class='message is-danger'> <div class='message-header'> <p>Bład logowania</p> <button class='delete' aria-label='delete'></button> </div> <div class='message-body'><strong>" + returnedData['message'] + "</strong></div></article>");
+                $('#notification').append("<article class='message is-danger'> <div class='message-header'> <p>Bład logowania</p> <button class='delete' aria-label='delete' id='delete-button'></button> </div> <div class='message-body'><strong>" + returnedData['message'] + "</strong></div></article>");
             }
         });
+    });
+    $("#delete-button").click(function() {
+        console.log("test");
+        $('#notification').empty();
     });
 </script>
 <!-- End JavaScript Section -->

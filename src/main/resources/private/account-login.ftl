@@ -149,6 +149,9 @@
 <script defer>AOS.init();</script>
 <script defer>
     $(document).ready(function() {
+        $(".delete").click(function() {
+            $('#notification').empty();
+        });
         $(".navbar-burger").click(function() {
             $(".navbar-burger").toggleClass("is-active");
             $(".navbar-menu").toggleClass("is-active");

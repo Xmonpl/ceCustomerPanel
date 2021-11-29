@@ -2,6 +2,7 @@ package org.eu.xmon.customerpanel.database;
 
 import com.dieselpoint.norm.Database;
 import lombok.Getter;
+import org.eu.xmon.customerpanel.object.Action;
 import org.eu.xmon.customerpanel.object.User;
 
 import java.io.File;
@@ -25,6 +26,7 @@ public class DbConnect {
         database.setJdbcUrl("jdbc:sqlite:database.db");
         if (!new File("database.db").exists()) {
             database.createTable(User.class);
+            database.createTable(Action.class);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() ->{

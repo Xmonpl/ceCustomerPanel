@@ -7,9 +7,12 @@ import com.ftpix.sparknnotation.annotations.SparkPost;
 import com.ftpix.sparknnotation.annotations.SparkQueryParam;
 import com.google.gson.Gson;
 import org.eu.xmon.customerpanel.database.DbConnect;
+import org.eu.xmon.customerpanel.object.Action;
+import org.eu.xmon.customerpanel.object.ActionStatus;
 import org.eu.xmon.customerpanel.object.User;
 import org.eu.xmon.customerpanel.response.StandardResponse;
 import org.eu.xmon.customerpanel.response.StatusResponse;
+import org.eu.xmon.customerpanel.utils.DatabaseUtils;
 import org.eu.xmon.customerpanel.utils.RegexVariables;
 import spark.ModelAndView;
 import spark.Request;
@@ -34,7 +37,7 @@ public class RegisterController {
             }else{
                 final Map<String, Object> model = new HashMap<>();
                 return new VelocityTemplateEngine().render(
-                        new ModelAndView(model, "private/account-login.ftl")
+                        new ModelAndView(model, "private/account-register.ftl")
                 );
             }
         }else {
@@ -57,7 +60,7 @@ public class RegisterController {
             return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Email is not valid").build());
         }
         if (!RegexVariables.PASSWORD_REGEX.matcher(password).matches()){
-            return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Your password is safe! <br />The password must contain the following criteria: <br /><br />* At least 8 characters, at least one uppercase and lowercase letter and a special character!").build());
+            return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Your password is dangerous! <br />The password must contain the following criteria: <br /><br />* At least 8 characters, at least one uppercase and lowercase letter and a special character!").build());
         }
         UUID uuid = UUID.randomUUID();
         boolean use = true;
@@ -73,13 +76,21 @@ public class RegisterController {
                 .create_time(new Timestamp(System.currentTimeMillis()).toString())
                 .email(name)
                 .first_ip(req.ip())
-                .last_ip(req.ip())
+                .last_ip("-")
                 .balance(0.0)
                 .full_name(fullname)
-                .password(BCrypt.withDefaults().hashToString(12, password.toCharArray()))
+                .password(BCrypt.withDefaults().hashToString(8, password.toCharArray()))
                 .build();
-        DbConnect.getDatabase().insert(user);
-        res.cookie("/", "token", BCrypt.withDefaults().hashToString(6, (user.id + "-" + req.ip()).toCharArray()), 3600,false, true);
+        final Action register$action = Action.builder()
+                .actionStatus(ActionStatus.REGISTRATION_STARTED.name())
+                        .ip(req.ip())
+                        .timestamp(new Timestamp(System.currentTimeMillis()))
+                        .useragent(req.userAgent())
+                        .user_id(uuid.toString())
+                        .build();
+        DatabaseUtils.insert(user);
+        DatabaseUtils.insert(register$action);
+        res.cookie("/", "token", BCrypt.withDefaults().hashToString(4, (user.id + "-" + req.ip()).toCharArray()), 3600,false, true);
         res.cookie("/", "uuid", user.id, 3600,false, true);
         System.out.println("[+] New User - " + user.toString());
         return new Gson().toJson(StandardResponse.builder().status(StatusResponse.OK).message("User created successfuly!").build());

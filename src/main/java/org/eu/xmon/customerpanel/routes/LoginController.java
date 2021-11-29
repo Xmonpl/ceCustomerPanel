@@ -7,17 +7,22 @@ import com.ftpix.sparknnotation.annotations.SparkPost;
 import com.ftpix.sparknnotation.annotations.SparkQueryParam;
 import com.google.gson.Gson;
 import org.eu.xmon.customerpanel.database.DbConnect;
+import org.eu.xmon.customerpanel.object.Action;
+import org.eu.xmon.customerpanel.object.ActionStatus;
 import org.eu.xmon.customerpanel.object.User;
 import org.eu.xmon.customerpanel.response.StandardResponse;
 import org.eu.xmon.customerpanel.response.StatusResponse;
+import org.eu.xmon.customerpanel.utils.DatabaseUtils;
 import org.eu.xmon.customerpanel.utils.RegexVariables;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.template.velocity.VelocityTemplateEngine;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 @SparkController
 public class LoginController {
@@ -57,11 +62,37 @@ public class LoginController {
         }
         final BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), user.getPassword());
         if (!result.verified){
+            final Action login$failed$atempt = Action.builder()
+                    .actionStatus(ActionStatus.FAILED_LOGIN_ATTEMPT.name())
+                    .ip(req.ip())
+                    .timestamp(new Timestamp(System.currentTimeMillis()))
+                    .useragent(req.userAgent())
+                    .user_id(user.id)
+                    .build();
+            DatabaseUtils.insert(login$failed$atempt);
             return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("The email or password is incorrect or the account has not been activated").build());
         }
+        if (user.getLast_ip().equals("-")){
+            final Action register$success$action = Action.builder()
+                    .actionStatus(ActionStatus.REGISTRATION_COMPLETED.name())
+                    .ip(req.ip())
+                    .timestamp(new Timestamp(System.currentTimeMillis()))
+                    .useragent(req.userAgent())
+                    .user_id(user.id)
+                    .build();
+            DatabaseUtils.insert(register$success$action);
+        }
         user.setLast_ip(req.ip());
-        DbConnect.getDatabase().update(user);
-        res.cookie("/", "token", BCrypt.withDefaults().hashToString(6, (user.id + "-" + req.ip()).toCharArray()), 3600,false, true);
+        DatabaseUtils.update(user);
+        final Action login$success = Action.builder()
+                .actionStatus(ActionStatus.LOGGED_IN.name())
+                .ip(req.ip())
+                .timestamp(new Timestamp(System.currentTimeMillis()))
+                .useragent(req.userAgent())
+                .user_id(user.id)
+                .build();
+        DatabaseUtils.insert(login$success);
+        res.cookie("/", "token", BCrypt.withDefaults().hashToString(4, (user.id + "-" + req.ip()).toCharArray()), 3600,false, true);
         res.cookie("/", "uuid", user.id, 3600,false, true);
         System.out.println("[+-] SignIn User - " + user.toString());
         return new Gson().toJson(StandardResponse.builder().status(StatusResponse.OK).message("Login Succesfully").build());
