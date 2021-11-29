@@ -46,10 +46,10 @@ public class User implements Serializable {
     @Column(name = "balance")
     private double balance;
 
-    @Column(name = "actions")
+   /*@Column(name = "actions")
     @DbSerializer(JSONSerializer.class)
     private List<String> actions;
-
+    */
 
 
 }
