@@ -19,7 +19,7 @@ import java.util.UUID;
 public class RegisterController {
 
     @SparkPost("/account/register")
-    public String register(@SparkQueryParam("email") final String name, @SparkQueryParam("password") final String password, @SparkQueryParam("fullname") final String fullname, Request req, Response res){
+    public String register(@SparkQueryParam("email") final String name, @SparkQueryParam("password") final String password, @SparkQueryParam("fullname") final String fullname, final Request req, final Response res){
         if (name == null || password == null || fullname == null || name.isEmpty() || password.isEmpty() || fullname.isEmpty() || name.isBlank() || password.isBlank() || fullname.isBlank()) {
             return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Username or Password is empty/blank or is nullable!").build());
         }
