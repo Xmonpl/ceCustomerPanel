@@ -10,6 +10,7 @@ import org.eu.xmon.customerpanel.database.DbConnect;
 import org.eu.xmon.customerpanel.object.User;
 import org.eu.xmon.customerpanel.response.StandardResponse;
 import org.eu.xmon.customerpanel.response.StatusResponse;
+import org.eu.xmon.customerpanel.utils.RegexVariables;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -52,6 +53,12 @@ public class RegisterController {
         if (DbConnect.getDatabase().sql("SELECT * from users WHERE email = ?", name).first(User.class) != null) {
             return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Email is already exist! An account already exists on this email address").build());
         }
+        if (!RegexVariables.EMAIL_REGEX.matcher(name).matches()){
+            return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Email is not valid").build());
+        }
+        if (!RegexVariables.PASSWORD_REGEX.matcher(password).matches()){
+            return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Your password is safe! <br />The password must contain the following criteria: <br /><br />* At least 8 characters, at least one uppercase and lowercase letter and a special character!").build());
+        }
         UUID uuid = UUID.randomUUID();
         boolean use = true;
         do{
@@ -75,6 +82,6 @@ public class RegisterController {
         res.cookie("/", "token", BCrypt.withDefaults().hashToString(6, (user.id + "-" + req.ip()).toCharArray()), 3600,false, true);
         res.cookie("/", "uuid", user.id, 3600,false, true);
         System.out.println("[+] New User - " + user.toString());
-        return new Gson().toJson(StandardResponse.builder().status(StatusResponse.OK).data(new Gson().toJsonTree(user)).message("User created successfuly!").build());
+        return new Gson().toJson(StandardResponse.builder().status(StatusResponse.OK).message("User created successfuly!").build());
     }
 }
