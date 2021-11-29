@@ -1,11 +1,14 @@
 package org.eu.xmon.customerpanel.object;
 
+import com.dieselpoint.norm.serialize.DbSerializer;
 import lombok.*;
+import org.eu.xmon.customerpanel.utils.JSONSerializer;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Author Xmon
@@ -39,5 +42,14 @@ public class User implements Serializable {
 
     @Column(name = "last_ip")
     private String last_ip;
+
+    @Column(name = "balance")
+    private double balance;
+
+    @Column(name = "actions")
+    @DbSerializer(JSONSerializer.class)
+    private List<String> actions;
+
+
 
 }

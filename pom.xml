@@ -85,6 +85,11 @@
             <artifactId>bcrypt</artifactId>
             <version>0.9.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.ftpix</groupId>
+            <artifactId>sparknotation</artifactId>
+            <version>1.15</version>
+        </dependency>
     </dependencies>
 
 </project>
