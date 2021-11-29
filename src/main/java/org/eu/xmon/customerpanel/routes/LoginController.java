@@ -20,6 +20,7 @@ import spark.Response;
 import spark.template.velocity.VelocityTemplateEngine;
 
 import java.sql.Timestamp;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -32,7 +33,7 @@ public class LoginController {
         if (request.cookie("uuid") != null && request.cookie("token") != null ){
             final BCrypt.Result result = BCrypt.verifyer().verify((request.cookie("uuid") + "-" + request.ip()).toCharArray(), request.cookie("token"));
             if (result.verified){
-                response.redirect("/");
+                response.redirect("/account/dashboard");
                 return null;
             }else{
                 final Map<String, Object> model = new HashMap<>();
@@ -65,7 +66,7 @@ public class LoginController {
             final Action login$failed$atempt = Action.builder()
                     .actionStatus(ActionStatus.FAILED_LOGIN_ATTEMPT.name())
                     .ip(req.ip())
-                    .timestamp(new Timestamp(System.currentTimeMillis()))
+                    .timestamp(LocalTime.now().toString())
                     .useragent(req.userAgent())
                     .user_id(user.id)
                     .build();
@@ -76,7 +77,7 @@ public class LoginController {
             final Action register$success$action = Action.builder()
                     .actionStatus(ActionStatus.REGISTRATION_COMPLETED.name())
                     .ip(req.ip())
-                    .timestamp(new Timestamp(System.currentTimeMillis()))
+                    .timestamp(LocalTime.now().toString())
                     .useragent(req.userAgent())
                     .user_id(user.id)
                     .build();
@@ -87,7 +88,7 @@ public class LoginController {
         final Action login$success = Action.builder()
                 .actionStatus(ActionStatus.LOGGED_IN.name())
                 .ip(req.ip())
-                .timestamp(new Timestamp(System.currentTimeMillis()))
+                .timestamp(LocalTime.now().toString())
                 .useragent(req.userAgent())
                 .user_id(user.id)
                 .build();

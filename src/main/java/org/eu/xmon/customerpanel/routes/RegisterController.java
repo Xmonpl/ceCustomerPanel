@@ -20,6 +20,7 @@ import spark.Response;
 import spark.template.velocity.VelocityTemplateEngine;
 
 import java.sql.Timestamp;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -32,7 +33,7 @@ public class RegisterController {
         if (request.cookie("uuid") != null && request.cookie("token") != null ){
             final BCrypt.Result result = BCrypt.verifyer().verify((request.cookie("uuid") + "-" + request.ip()).toCharArray(), request.cookie("token"));
             if (result.verified){
-                response.redirect("/");
+                response.redirect("/account/dashboard");
                 return null;
             }else{
                 final Map<String, Object> model = new HashMap<>();
@@ -84,7 +85,7 @@ public class RegisterController {
         final Action register$action = Action.builder()
                 .actionStatus(ActionStatus.REGISTRATION_STARTED.name())
                         .ip(req.ip())
-                        .timestamp(new Timestamp(System.currentTimeMillis()))
+                        .timestamp(LocalTime.now().toString())
                         .useragent(req.userAgent())
                         .user_id(uuid.toString())
                         .build();

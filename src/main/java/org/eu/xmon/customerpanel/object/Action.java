@@ -32,5 +32,5 @@ public class Action {
     private String actionStatus;
 
     @Column(name = "created_at")
-    private Timestamp timestamp;
+    private String timestamp;
 }
