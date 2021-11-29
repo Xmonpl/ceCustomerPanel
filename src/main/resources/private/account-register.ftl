@@ -68,35 +68,47 @@
 
 <section class="section is-large">
     <div class="container">
-        <div class="box">
+        <div class="box mb-6">
             <div class="columns">
                 <div class="column mr-6" data-aos="fade-left">
-                    <img src="/image/authentication.svg" alt="Header Image">
+                    <img src="/image/witaj.svg" alt="Header Image">
                 </div>
                 <div class="column ml-6" data-aos="fade-right">
-                    <form id="login-form">
-                        <h1 class="title">customer.CodeEira.eu.org - Login</h1>
+                    <form id="register-form">
+                        <h1 class="title">customer.CodeEira.eu.org - Register</h1>
                         <div id="notification"></div>
-                        <div class="field mt-6">
+                        <div class="field">
                             <p class="control has-icons-left has-icons-right">
                                 <input class="input" type="email" placeholder="E-mail" id="email" required>
                                 <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
                             </p>
                         </div>
                         <div class="field">
+                            <p class="control has-icons-left has-icons-right">
+                                <input class="input" type="text" placeholder="Imię i Nazwisko" id="fullname" required>
+                                <span class="icon is-small is-left"><i class="fas fa-user"></i></span>
+                            </p>
+                        </div>
+                        <div class="field">
                             <p class="control has-icons-left">
-                                <input class="input" type="password" placeholder="Hasło" id="password" required>
+                                <input class="input" type="password" placeholder="Hasło" id="password" required >
+                                <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control has-icons-left">
+                                <input class="input" type="password" placeholder="Powtórz Hasło" id="password_confirm" required>
                                 <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
                             </p>
                         </div>
                         <label class="checkbox mb-3">
-                            <input type="checkbox">
-                            Zapamiętaj dane do logowania
+                            <input type="checkbox" required>
+                            Zgadzam się z <a href="#">warunkami korzystania z usługi oraz regulaminem</a>
                         </label>
                         <div class="field">
                             <p class="control">
                                 <button class="button is-success">
-                                    Zaloguj się!
+                                    Zarejestruj się!
                                 </button>
                             </p>
                         </div>
@@ -157,19 +169,29 @@
             $("#pageloader").removeClass('is-active');
         }, 2500);
     });
-
+    const password = document.getElementById("password")
+        , confirm_password = document.getElementById("password_confirm");
+    function validatePassword(){
+        if(password.value != confirm_password.value) {
+            confirm_password.setCustomValidity("Hasła nie są takie same");
+        } else {
+            confirm_password.setCustomValidity('');
+        }
+    }
+    password.onchange = validatePassword;
+    confirm_password.onkeyup = validatePassword;
     const thisForm = document.getElementById('login-form');
-    $( "#login-form" ).submit(async function (e) {
+    $( "#register-form" ).submit(async function (e) {
         e.preventDefault();
         $('#notification').empty();
         $.ajax({
             method:"POST",
-            url: "http://localhost/account/login",
-            data: {"email": document.getElementById("email").value, "password": document.getElementById("password").value}
+            url: "http://localhost/account/register",
+            data: {"email": document.getElementById("email").value, "password": document.getElementById("password").value, "fullname": document.getElementById("fullname").value}
         }).done(function(response){
             var returnedData = JSON.parse(response);
             if (returnedData['status'] === 'OK') {
-                alert("zalogowano");
+                alert("zarejestrowano");
             } else {
                 $('#notification').empty();
                 $('#notification').append("<article class='message is-danger'> <div class='message-header'> <p>Bład logowania</p> <button class='delete' aria-label='delete'></button> </div> <div class='message-body'><strong>" + returnedData['message'] + "</strong></div></article>");

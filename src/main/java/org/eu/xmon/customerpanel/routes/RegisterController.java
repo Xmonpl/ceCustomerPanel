@@ -2,6 +2,7 @@ package org.eu.xmon.customerpanel.routes;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.ftpix.sparknnotation.annotations.SparkController;
+import com.ftpix.sparknnotation.annotations.SparkGet;
 import com.ftpix.sparknnotation.annotations.SparkPost;
 import com.ftpix.sparknnotation.annotations.SparkQueryParam;
 import com.google.gson.Gson;
@@ -9,14 +10,39 @@ import org.eu.xmon.customerpanel.database.DbConnect;
 import org.eu.xmon.customerpanel.object.User;
 import org.eu.xmon.customerpanel.response.StandardResponse;
 import org.eu.xmon.customerpanel.response.StatusResponse;
+import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
+import spark.template.velocity.VelocityTemplateEngine;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @SparkController
 public class RegisterController {
+
+    @SparkGet("/account/register")
+    public String loginView(final Request request, final Response response){
+        if (request.cookie("uuid") != null && request.cookie("token") != null ){
+            final BCrypt.Result result = BCrypt.verifyer().verify((request.cookie("uuid") + "-" + request.ip()).toCharArray(), request.cookie("token"));
+            if (result.verified){
+                response.redirect("/");
+                return null;
+            }else{
+                final Map<String, Object> model = new HashMap<>();
+                return new VelocityTemplateEngine().render(
+                        new ModelAndView(model, "private/account-login.ftl")
+                );
+            }
+        }else {
+            final Map<String, Object> model = new HashMap<>();
+            return new VelocityTemplateEngine().render(
+                    new ModelAndView(model, "private/account-register.ftl")
+            );
+        }
+    }
 
     @SparkPost("/account/register")
     public String register(@SparkQueryParam("email") final String name, @SparkQueryParam("password") final String password, @SparkQueryParam("fullname") final String fullname, final Request req, final Response res){
