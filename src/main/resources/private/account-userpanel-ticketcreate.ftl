@@ -148,58 +148,88 @@
     </div>
     <div class="column">
         <div class="container pt-6">
-            <h1 class="title">Wydarzenia</h1>
-            <ul>
-                #if( $actions.isEmpty() )
-                <li class="box mb-">Brak akcji na tej stronie ;c</li>
-                #else
-                    #foreach( $action in $actions )
-                    <li class="box mb-1">$action.timestamp - $action.actionStatus (IP: $action.ip) <a class="is-pulled-right" onclick="loadAction(${action.gettwojastara()})" >Więcej</a></li>
-                    #end
-                #end
-            </ul>
-            <div class="buttons is-centered mt-4">
-                <a class="button is-link is-rounded" id="previous"><- Poprzednia strona</a>
-                <a class="button is-link is-rounded" id="current" disabled></a>
-                <a class="button is-link is-rounded" id="next" >Następna strona -></a>
+            <div class="box">
+                <h1 class="title">Utwórz zgłoszenie</h1>
+                <form id="ticket-create">
+                    <div class="field">
+                        <label class="label">Tytuł zgłoszenia</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Tytuł zgłoszenia" id="topic">
+                        </div>
+                    </div>
+
+
+                    <div class="field">
+                        <label class="label">Priorytet</label>
+                        <div class="control">
+                            <div class="select">
+                                <select id="priority">
+                                    <option value="LOW">Niski</option>
+                                    <option value="NORMAL">Normalny</option>
+                                    <option value="HIGH">Wysoki</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Wiadomość</label>
+                        <div class="control">
+                            <textarea class="textarea" placeholder="Opisz swój problem..." id="message"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-link">Utwórz zgłoszenie!</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 $footer
 <script>
-    function loadAction(id){
-        $('#modals').empty();
+    $( "#ticket-create" ).submit(async function (e) {
+        e.preventDefault();
         $.ajax({
             method:"POST",
-            url: "http://localhost/api/action/flat",
-            data: {"id": id}
+            url: "http://localhost/api/ticket/create",
+            data: {"topic": document.getElementById("topic").value, "message": document.getElementById("message").value, "priority": document.getElementById("priority").value}
         }).done(function(response){
-            $('#modals').empty();
-            $('#modals').append(response);
+            var returnedData = JSON.parse(response);
+            if (returnedData['status'] === 'OK') {
+                $('#modals').empty();
+                $('#modals').append("<div class=\"modal is-active\">" +
+                    "        <div class=\"modal-background\"></div>" +
+                    "        <div class=\"modal-card\">" +
+                    "            <header class=\"modal-card-head\">" +
+                    "                <p class=\"modal-card-title\">Ticket Utworzony Pomyślnie!</p>" +
+                    "                <button class=\"delete\" aria-label=\"close\" onclick=\"$('#modals').empty()\"></button>" +
+                    "            </header>" +
+                    "            <section class=\"modal-card-body\">" +
+                    "                <p><strong>ID: </strong> " + returnedData['data']['id'] + "</p>" +
+                    "                <p><Strong>Odpiszemy najszybciej jak to możliwe!</strong></p>" +
+                    "            </section>" +
+                    "        </div>" +
+                    "    </div>")
+            }else{
+                $('#modals').empty();
+                $('#modals').append("<div class=\"modal is-active\">" +
+                    "        <div class=\"modal-background\"></div>" +
+                    "        <div class=\"modal-card\">" +
+                    "            <header class=\"modal-card-head\">" +
+                    "                <p class=\"modal-card-title\">Ticket nie został utworzony!</p>" +
+                    "                <button class=\"delete\" aria-label=\"close\" onclick=\"$('#modals').empty()\"></button>" +
+                    "            </header>" +
+                    "            <section class=\"modal-card-body\">" +
+                    "                <p><Strong>Wystąpił następujący bład, skontaktuj się z administracja serwisu!</strong></p>" +
+                    "                <p>" + returnedData['message'] + "</p>" +
+                    "            </section>" +
+                    "        </div>" +
+                    "    </div>")
+            }
         });
-    }
-    $(document).ready(function() {
-        $('#previous').attr("href", getPreviousPage());
-        $('#next').attr("href", getNextPage());
-        $('#current').text(getCurrentPage());
     });
-    function getCurrentPage(){
-        return window.location.pathname.split("/")[4];
-    }
-
-    function getPreviousPage(){
-        const path = window.location.pathname.split("/");
-        const page = (parseInt(path[4]) - 1);
-        if (page <= 0){
-            return "/account/dashboard/actions/1";
-        }else{
-            return "/account/dashboard/actions/" + page;
-        }
-    }
-    function getNextPage(){
-        const path = window.location.pathname.split("/");
-        const page = (parseInt(path[4]) + 1);
-        return "/account/dashboard/actions/" + page;
-    }
 </script>

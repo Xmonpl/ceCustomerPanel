@@ -90,7 +90,7 @@
                     </a>
                     <hr class="navbar-divider">
                     <a class="navbar-item">
-                        Report an issue
+                        <a href="/account/dashboard/logout">Wyloguj się!</a>
                     </a>
                 </div>
             </div>
@@ -99,7 +99,7 @@
             <span class="icon"><i class="fas fa-question-circle"></i></span>
         </a>
         <a class="navbar-item">
-            <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+            <a href="/account/dashboard/logout"><span class="icon"><i class="fas fa-sign-out-alt"></i></span></a>
         </a>
     </div>
 </nav>
