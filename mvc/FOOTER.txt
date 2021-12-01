@@ -1,0 +1,54 @@
+<footer class="footer">
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <p>
+                    <strong>CodeEira.eu.org</strong>,<br>
+                    <a href="https://Xmon.eu.org" target="_blank">Dominik Dobosz</a>,<br>
+                    <span class="has-tooltip-arrow has-tooltip-multiline" data-tooltip="Działalność nierejestrowa (Dz. U. 2018 poz. 646).">Działalność nieewidencjonowana,</span><br>
+                    Trzebinia, Polska.<br>
+                    E-mail: <a href="mailto:root@codeeira.eu.org">root@CodeEira.eu.org</a><br>
+                    Telefon: <a href="tel:+48785531448">+48 785 531 448</a>
+                </p>
+            </div>
+            <div class="column">
+                <div class="columns">
+                    <div class="column">
+                        <h2 class="subtitle">Usługi</h2>
+                        <ul>
+                            <li><a href="#">Logowanie</a></li>
+                            <li><a href="#">Rejestracja</a></li>
+                            <li><a href="#">Panel Administracyjny</a></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h2 class="subtitle">CodeEira.eu.org</h2>
+                        <ul>
+                            <li><a href="#">Kontakt</a></li>
+                            <li><a href="#">Polityka prywatności</a></li>
+                            <li><a href="#">Regulaminy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- Start JavaScript Section -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer>AOS.init();</script>
+<script defer>
+    $(document).ready(function() {
+        $(".navbar-burger").click(function() {
+            $(".navbar-burger").toggleClass("is-active");
+            $(".navbar-menu").toggleClass("is-active");
+        });
+        setTimeout(function() {
+            $("#pageloader").removeClass('is-active');
+        }, 1000);
+    });
+</script>
+<!-- End JavaScript Section -->
+</body>
+</html>

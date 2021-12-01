@@ -172,7 +172,7 @@
         }).done(function(response){
             var returnedData = JSON.parse(response);
             if (returnedData['status'] === 'OK') {
-                alert("zalogowano");
+                window.location.replace("http://localhost/account/dashboard");
             } else {
                 $('#notification').empty();
                 $('#notification').append("<article class='message is-danger'> <div class='message-header'> <p>Bład logowania</p> <button class='delete' aria-label='delete'></button> </div> <div class='message-body'><strong>" + returnedData['message'] + "</strong></div></article>");

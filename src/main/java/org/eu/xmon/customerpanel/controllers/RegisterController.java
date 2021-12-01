@@ -1,4 +1,4 @@
-package org.eu.xmon.customerpanel.routes;
+package org.eu.xmon.customerpanel.controllers;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.ftpix.sparknnotation.annotations.SparkController;
@@ -13,14 +13,14 @@ import org.eu.xmon.customerpanel.object.User;
 import org.eu.xmon.customerpanel.response.StandardResponse;
 import org.eu.xmon.customerpanel.response.StatusResponse;
 import org.eu.xmon.customerpanel.utils.DatabaseUtils;
+import org.eu.xmon.customerpanel.utils.OtherUtils;
 import org.eu.xmon.customerpanel.utils.RegexVariables;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.template.velocity.VelocityTemplateEngine;
 
-import java.sql.Timestamp;
-import java.time.LocalTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -74,7 +74,7 @@ public class RegisterController {
         }while (use);
         final User user = User.builder()
                 .id(uuid.toString())
-                .create_time(new Timestamp(System.currentTimeMillis()).toString())
+                .create_time(OtherUtils.getFormatter().format(new Date()))
                 .email(name)
                 .first_ip(req.ip())
                 .last_ip("-")
@@ -83,9 +83,9 @@ public class RegisterController {
                 .password(BCrypt.withDefaults().hashToString(8, password.toCharArray()))
                 .build();
         final Action register$action = Action.builder()
-                .actionStatus(ActionStatus.REGISTRATION_STARTED.name())
+                .actionStatus(ActionStatus.REGISTRATION_STARTED.message)
                         .ip(req.ip())
-                        .timestamp(LocalTime.now().toString())
+                        .timestamp(OtherUtils.getFormatter().format(new Date()))
                         .useragent(req.userAgent())
                         .user_id(uuid.toString())
                         .build();

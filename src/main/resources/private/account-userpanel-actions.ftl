@@ -115,7 +115,7 @@
                 </div>
             </div>
             <ul class="menu-list">
-                <li><a class="is-active">Panel użytkownika</a></li>
+                <li><a href="/account/dashboard">Panel użytkownika</a></li>
             </ul>
             <p class="menu-label">
                 Usługi Główne
@@ -144,52 +144,26 @@
             </p>
             <ul class="menu-list">
                 <li><a>Formularz kontaktowy</a></li>
-                <li><a href="/account/dashboard/actions/1">Wydarzenia konta</a></li>
+                <li><a class="is-active" href="/account/dashboard/actions/1">Wydarzenia konta</a></li>
             </ul>
         </aside>
     </div>
     <div class="column">
         <div class="container pt-6">
-            <div class="columns">
-                <div class="column">
-                    <div class="box">
-                        <strong>Aktywne usługi</strong>
-                        <p>5</p>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="box">
-                        <strong>Wydantki z ostatnich 30 dni</strong>
-                        <p>130.00 PLN</p>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="box">
-                        <strong>Zaległe płatności</strong>
-                        <p><strong style="color: red">30.00 PLN</strong></p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="columns">
-                <div class="column">
-                    <div class="box">
-                        <h2><strong>Ostatnie wydarzenia</strong></h2>
-                        <ul>
-                            #foreach( $action in $actions )
-                                <li class="box mb-1">$action.timestamp - $action.actionStatus (IP: $action.ip) <a class="is-pulled-right" onclick="loadAction(${action.gettwojastara()})" >Więcej</a></li>
-                            #end
-                        </ul>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="box">
-                        <h2><strong>Ostatnie płatności</strong></h2>
-                        <ul>
-                            <li class="box mb-1">Brak ostatnich płatności</li>
-                        </ul>
-                    </div>
-                </div>
+            <h1 class="title">Wydarzenia</h1>
+            <ul>
+                #if( $actions.isEmpty() )
+                <li class="box mb-">Brak akcji na tej stronie ;c</li>
+                #else
+                    #foreach( $action in $actions )
+                    <li class="box mb-1">$action.timestamp - $action.actionStatus (IP: $action.ip) <a class="is-pulled-right" onclick="loadAction(${action.gettwojastara()})" >Więcej</a></li>
+                    #end
+                #end
+            </ul>
+            <div class="buttons is-centered mt-4">
+                <a class="button is-link is-rounded" id="previous"><- Poprzednia strona</a>
+                <a class="button is-link is-rounded" id="current" disabled></a>
+                <a class="button is-link is-rounded" id="next" >Następna strona -></a>
             </div>
         </div>
     </div>
@@ -206,5 +180,28 @@ $footer
             $('#modals').empty();
             $('#modals').append(response);
         });
+    }
+    $(document).ready(function() {
+        $('#previous').attr("href", getPreviousPage());
+        $('#next').attr("href", getNextPage());
+        $('#current').text(getCurrentPage());
+    });
+    function getCurrentPage(){
+        return window.location.pathname.split("/")[4];
+    }
+
+    function getPreviousPage(){
+        const path = window.location.pathname.split("/");
+        const page = (parseInt(path[4]) - 1);
+        if (page <= 0){
+            return "/account/dashboard/actions/1";
+        }else{
+            return "/account/dashboard/actions/" + page;
+        }
+    }
+    function getNextPage(){
+        const path = window.location.pathname.split("/");
+        const page = (parseInt(path[4]) + 1);
+        return "/account/dashboard/actions/" + page;
     }
 </script>

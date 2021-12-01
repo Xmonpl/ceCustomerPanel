@@ -51,9 +51,7 @@
 </head>
 <body>
 <div class="pageloader is-active" id="pageloader"><span class="title">customer.CodeEira.eu.org</span></div>
-<div id="modals">
 
-</div>
 <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <a class="navbar-item" href="https://bulma.io">
@@ -103,108 +101,3 @@
         </a>
     </div>
 </nav>
-<div class="columns">
-    <div class="column is-one-fifth pl-4 pt-4">
-        <aside class="menu">
-            <div class="columns is-mobile">
-                <div class="column is-half is-offset-one-quarter">
-                    <img class="image is-128x128" src='$avatar' alt="John Doe">
-                    <p>$user.full_name</p>
-                    <p>$user.email</p>
-                    <span class="tag is-rounded is-success ml-3">Portfel: $user.balance</span>
-                </div>
-            </div>
-            <ul class="menu-list">
-                <li><a class="is-active">Panel użytkownika</a></li>
-            </ul>
-            <p class="menu-label">
-                Usługi Główne
-            </p>
-            <ul class="menu-list">
-                <li><a>Anty Proxy</a></li>
-                <li><a>Wykrywacz przekleństw</a></li>
-                <li><a>Sklep Minecraft</a></li>
-            </ul>
-            <p class="menu-label">
-                Usługi Niestandardowe
-            </p>
-            <ul class="menu-list">
-                <li><a>Brak ;c</a></li>
-            </ul>
-            <p class="menu-label">
-                Dokumentacja
-            </p>
-            <ul class="menu-list">
-                <li><a>Anty Proxy</a></li>
-                <li><a>Wykrywacz przekleństw</a></li>
-                <li><a>Sklep Minecraft</a></li>
-            </ul>
-            <p class="menu-label">
-                Pomoc
-            </p>
-            <ul class="menu-list">
-                <li><a>Formularz kontaktowy</a></li>
-                <li><a href="/account/dashboard/actions/1">Wydarzenia konta</a></li>
-            </ul>
-        </aside>
-    </div>
-    <div class="column">
-        <div class="container pt-6">
-            <div class="columns">
-                <div class="column">
-                    <div class="box">
-                        <strong>Aktywne usługi</strong>
-                        <p>5</p>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="box">
-                        <strong>Wydantki z ostatnich 30 dni</strong>
-                        <p>130.00 PLN</p>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="box">
-                        <strong>Zaległe płatności</strong>
-                        <p><strong style="color: red">30.00 PLN</strong></p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="columns">
-                <div class="column">
-                    <div class="box">
-                        <h2><strong>Ostatnie wydarzenia</strong></h2>
-                        <ul>
-                            #foreach( $action in $actions )
-                                <li class="box mb-1">$action.timestamp - $action.actionStatus (IP: $action.ip) <a class="is-pulled-right" onclick="loadAction(${action.gettwojastara()})" >Więcej</a></li>
-                            #end
-                        </ul>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="box">
-                        <h2><strong>Ostatnie płatności</strong></h2>
-                        <ul>
-                            <li class="box mb-1">Brak ostatnich płatności</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-$footer
-<script>
-    function loadAction(id){
-        $('#modals').empty();
-        $.ajax({
-            method:"POST",
-            url: "http://localhost/api/action/flat",
-            data: {"id": id}
-        }).done(function(response){
-            $('#modals').empty();
-            $('#modals').append(response);
-        });
-    }
-</script>

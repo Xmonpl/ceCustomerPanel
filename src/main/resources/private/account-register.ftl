@@ -191,7 +191,7 @@
         }).done(function(response){
             var returnedData = JSON.parse(response);
             if (returnedData['status'] === 'OK') {
-                alert("zarejestrowano");
+                window.location.replace("http://localhost/account/dashboard");
             } else {
                 $('#notification').empty();
                 $('#notification').append("<article class='message is-danger'> <div class='message-header'> <p>Bład logowania</p> <button class='delete' aria-label='delete' id='delete-button'></button> </div> <div class='message-body'><strong>" + returnedData['message'] + "</strong></div></article>");

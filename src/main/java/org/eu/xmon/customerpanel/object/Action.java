@@ -33,4 +33,9 @@ public class Action {
 
     @Column(name = "created_at")
     private String timestamp;
+
+    @Transient
+    public Integer gettwojastara() {
+        return id;
+    }
 }

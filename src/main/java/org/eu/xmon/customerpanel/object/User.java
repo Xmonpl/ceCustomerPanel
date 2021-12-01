@@ -2,7 +2,6 @@ package org.eu.xmon.customerpanel.object;
 
 import com.dieselpoint.norm.serialize.DbSerializer;
 import lombok.*;
-import org.eu.xmon.customerpanel.utils.JSONSerializer;
 
 import javax.persistence.Column;
 import javax.persistence.Id;

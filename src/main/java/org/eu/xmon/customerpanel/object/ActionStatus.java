@@ -6,8 +6,9 @@ public enum ActionStatus {
     REGISTRATION_COMPLETED("Aktywacja konta"),
     REGISTRATION_STARTED("Rozpoczęcie rejestracji");
 
-    private String message;
+    public String message;
 
     ActionStatus(String message) {
+        this.message = message;
     }
 }
