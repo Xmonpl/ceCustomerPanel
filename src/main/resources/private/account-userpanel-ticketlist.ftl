@@ -143,8 +143,8 @@
                 <li>
                     <a>Zgłoszenia</a>
                     <ul>
-                        <li><a class="is-active" href="/account/dashboard/ticket/new">Utwórz zgłoszenie</a></li>
-                        <li><a href="/account/dashboard/ticket/list/1" >Lista zgłoszeń</a></li>
+                        <li><a href="/account/dashboard/ticket/new">Utwórz zgłoszenie</a></li>
+                        <li><a class="is-active" href="/account/dashboard/ticket/list/1">Lista zgłoszeń</a></li>
                     </ul>
                 </li>
                 <li><a href="/account/dashboard/actions/1">Wydarzenia konta</a></li>
@@ -153,88 +153,49 @@
     </div>
     <div class="column">
         <div class="container pt-6">
-            <div class="box">
-                <h1 class="title">Utwórz zgłoszenie</h1>
-                <form id="ticket-create">
-                    <div class="field">
-                        <label class="label">Tytuł zgłoszenia</label>
-                        <div class="control">
-                            <input class="input" type="text" placeholder="Tytuł zgłoszenia" id="topic">
-                        </div>
-                    </div>
-
-
-                    <div class="field">
-                        <label class="label">Priorytet</label>
-                        <div class="control">
-                            <div class="select">
-                                <select id="priority">
-                                    <option value="LOW">Niski</option>
-                                    <option value="NORMAL">Normalny</option>
-                                    <option value="HIGH">Wysoki</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Wiadomość</label>
-                        <div class="control">
-                            <textarea class="textarea" placeholder="Opisz swój problem..." id="message"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <div class="control">
-                            <button class="button is-link">Utwórz zgłoszenie!</button>
-                        </div>
-                    </div>
-                </form>
+            <h1 class="title">Lista zgłoszeń</h1>
+            <ul>
+                #if( $tickets.isEmpty() )
+                    <li class="box mb-1">Na tej stronie nie znajdują się żadne zgłoszenia ;c</li>
+                #else
+                    #foreach( $ticket in $tickets )
+                    <li class="box mb-1">Zgłoszenie o id <strong>$ticket.getId()</strong> <span class='closed-$ticket.closed'></span><a class="is-pulled-right" href='/account/dashboard/ticket/show/$ticket.getId()'>Więcej</a></li>
+                    #end
+                #end
+            </ul>
+            <div class="buttons is-centered mt-4">
+                <a class="button is-link is-rounded" id="previous"><- Poprzednia strona</a>
+                <a class="button is-link is-rounded" id="current" disabled></a>
+                <a class="button is-link is-rounded" id="next" >Następna strona -></a>
             </div>
         </div>
     </div>
 </div>
 $footer
 <script>
-    $( "#ticket-create" ).submit(async function (e) {
-        e.preventDefault();
-        $.ajax({
-            method:"POST",
-            url: "http://localhost/api/ticket/create",
-            data: {"topic": document.getElementById("topic").value, "message": document.getElementById("message").value, "priority": document.getElementById("priority").value}
-        }).done(function(response){
-            var returnedData = JSON.parse(response);
-            if (returnedData['status'] === 'OK') {
-                $('#modals').empty();
-                $('#modals').append("<div class=\"modal is-active\">" +
-                    "        <div class=\"modal-background\"></div>" +
-                    "        <div class=\"modal-card\">" +
-                    "            <header class=\"modal-card-head\">" +
-                    "                <p class=\"modal-card-title\">Ticket Utworzony Pomyślnie!</p>" +
-                    "                <button class=\"delete\" aria-label=\"close\" onclick=\"$('#modals').empty()\"></button>" +
-                    "            </header>" +
-                    "            <section class=\"modal-card-body\">" +
-                    "                <p><strong>ID: </strong> " + returnedData['data']['id'] + "</p>" +
-                    "                <p><Strong>Odpiszemy najszybciej jak to możliwe!</strong></p>" +
-                    "            </section>" +
-                    "        </div>" +
-                    "    </div>")
-            }else{
-                $('#modals').empty();
-                $('#modals').append("<div class=\"modal is-active\">" +
-                    "        <div class=\"modal-background\"></div>" +
-                    "        <div class=\"modal-card\">" +
-                    "            <header class=\"modal-card-head\">" +
-                    "                <p class=\"modal-card-title\">Ticket nie został utworzony!</p>" +
-                    "                <button class=\"delete\" aria-label=\"close\" onclick=\"$('#modals').empty()\"></button>" +
-                    "            </header>" +
-                    "            <section class=\"modal-card-body\">" +
-                    "                <p><Strong>Wystąpił następujący bład, skontaktuj się z administracja serwisu!</strong></p>" +
-                    "                <p>" + returnedData['message'] + "</p>" +
-                    "            </section>" +
-                    "        </div>" +
-                    "    </div>")
-            }
-        });
+    $(document).ready(function() {
+        $('#previous').attr("href", getPreviousPage());
+        $('#next').attr("href", getNextPage());
+        $('#current').text(getCurrentPage());
+        $('.closed-0').append('<i class="fas fa-unlock" style="color: green;"></i>');
+        $('.closed-1').append('<i class="fas fa-lock" style="color: red;"></i>');
     });
+    function getCurrentPage(){
+        return window.location.pathname.split("/")[5];
+    }
+
+    function getPreviousPage(){
+        const path = window.location.pathname.split("/");
+        const page = (parseInt(path[5]) - 1);
+        if (page <= 0){
+            return "/account/dashboard/ticket/list/1";
+        }else{
+            return "/account/dashboard/ticket/list/" + page;
+        }
+    }
+    function getNextPage(){
+        const path = window.location.pathname.split("/");
+        const page = (parseInt(path[5]) + 1);
+        return "/account/dashboard/ticket/list/" + page;
+    }
 </script>

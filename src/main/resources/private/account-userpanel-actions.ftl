@@ -50,7 +50,6 @@
     <!-- End Style -->
 </head>
 <body>
-<div class="pageloader is-active" id="pageloader"><span class="title">customer.CodeEira.eu.org</span></div>
 <div id="modals"></div>
 <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
@@ -141,7 +140,13 @@
                 Pomoc
             </p>
             <ul class="menu-list">
-                <li><a>Formularz kontaktowy</a></li>
+                <li>
+                    <a>Zgłoszenia</a>
+                    <ul>
+                        <li><a href="/account/dashboard/ticket/new">Utwórz zgłoszenie</a></li>
+                        <li><a href="/account/dashboard/ticket/list/1">Lista zgłoszeń</a></li>
+                    </ul>
+                </li>
                 <li><a class="is-active" href="/account/dashboard/actions/1">Wydarzenia konta</a></li>
             </ul>
         </aside>
@@ -151,7 +156,7 @@
             <h1 class="title">Wydarzenia</h1>
             <ul>
                 #if( $actions.isEmpty() )
-                <li class="box mb-">Brak akcji na tej stronie ;c</li>
+                <li class="box mb-1">Brak akcji na tej stronie ;c</li>
                 #else
                     #foreach( $action in $actions )
                     <li class="box mb-1">$action.timestamp - $action.actionStatus (IP: $action.ip) <a class="is-pulled-right" onclick="loadAction(${action.gettwojastara()})" >Więcej</a></li>

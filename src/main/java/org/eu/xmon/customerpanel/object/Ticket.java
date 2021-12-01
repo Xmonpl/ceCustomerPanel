@@ -42,10 +42,15 @@ public class Ticket {
     public List<TicketMessage> messages;
 
     @Column(name = "closed")
-    private boolean closed;
+    private String closed;
 
     @Transient
     public UUID getId() {
         return UUID.fromString(id);
+    }
+
+    @Transient
+    public List<TicketMessage> getMessages() {
+        return messages;
     }
 }

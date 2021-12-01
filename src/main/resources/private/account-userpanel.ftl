@@ -115,7 +115,7 @@
                 </div>
             </div>
             <ul class="menu-list">
-                <li><a class="is-active">Panel użytkownika</a></li>
+                <li><a class="is-active" href="/account/dashboard">Panel użytkownika</a></li>
             </ul>
             <p class="menu-label">
                 Usługi Główne
@@ -143,7 +143,13 @@
                 Pomoc
             </p>
             <ul class="menu-list">
-                <li><a>Formularz kontaktowy</a></li>
+                <li>
+                    <a>Zgłoszenia</a>
+                    <ul>
+                        <li><a href="/account/dashboard/ticket/new">Utwórz zgłoszenie</a></li>
+                        <li><a href="/account/dashboard/ticket/list/1">Lista zgłoszeń</a></li>
+                    </ul>
+                </li>
                 <li><a href="/account/dashboard/actions/1">Wydarzenia konta</a></li>
             </ul>
         </aside>

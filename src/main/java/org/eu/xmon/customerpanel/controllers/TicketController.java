@@ -43,6 +43,7 @@ public class TicketController {
                             .id(uuid.toString())
                             .priority(TicketPriorityEnum.valueOf(priority))
                             .user_id(request.cookie("uuid"))
+                            .closed("0")
                             .build();
                     DbConnect.getDatabase().insert(ticket);
                     return new Gson().toJson(StandardResponse.builder().status(StatusResponse.OK).message("Ticket Created").data(new Gson().toJsonTree(ticket)).build());
