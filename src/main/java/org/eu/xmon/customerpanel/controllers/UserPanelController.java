@@ -2,19 +2,21 @@ package org.eu.xmon.customerpanel.controllers;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.ftpix.sparknnotation.annotations.*;
+import com.google.gson.Gson;
+import lombok.SneakyThrows;
 import org.eu.xmon.customerpanel.database.DbConnect;
 import org.eu.xmon.customerpanel.object.Action;
 import org.eu.xmon.customerpanel.object.Ticket;
 import org.eu.xmon.customerpanel.object.User;
-import org.eu.xmon.customerpanel.utils.MD5Util;
-import org.eu.xmon.customerpanel.utils.MvcEnum;
-import org.eu.xmon.customerpanel.utils.OtherUtils;
-import org.eu.xmon.customerpanel.utils.ParginationUtils;
+import org.eu.xmon.customerpanel.response.StandardResponse;
+import org.eu.xmon.customerpanel.response.StatusResponse;
+import org.eu.xmon.customerpanel.utils.*;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.template.velocity.VelocityTemplateEngine;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +42,6 @@ public class UserPanelController {
                 final User u = DbConnect.getDatabase().sql("SELECT * FROM `users` WHERE `id` = ?", request.cookie("uuid")).first(User.class);
                 model.put("user", u);
                 model.put("actions", ParginationUtils.getPage(DbConnect.getDatabase().sql("SELECT * FROM `actions` WHERE `user_id` = ? ORDER BY `id` DESC", request.cookie("uuid")).results(Action.class), Integer.parseInt(id), 10));
-                model.put("avatar", "https://www.gravatar.com/avatar/" + MD5Util.md5Hex(u.getEmail()));
                 model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
                 return new VelocityTemplateEngine().render(
                         new ModelAndView(model, "private/account-userpanel-actions.ftl")
@@ -53,6 +54,26 @@ public class UserPanelController {
             response.redirect("/account/register");
             return "";
         }
+    }
+    @SneakyThrows
+    @SparkGet("/api/avatar/:id")
+    public HttpServletResponse getAvatar(@SparkParam("id") final String uuid, final Request request, final Response response){
+        final HttpServletResponse raw = response.raw();
+        if (uuid != null && OtherUtils.isStringUUID(uuid)){
+            final String email = DbConnect.getDatabase().sql("SELECT `email` FROM `users` WHERE `id` = ?", uuid).first(String.class);
+            if (email != null) {
+                raw.getOutputStream().write(FileUtils.getByteImage("https://www.gravatar.com/avatar/" + MD5Util.md5Hex(email)));
+                raw.getOutputStream().flush();
+                raw.getOutputStream().close();
+                response.status(200);
+                return raw;
+            }
+        }
+        raw.getOutputStream().write(FileUtils.getByteImage("https://www.gravatar.com/avatar/00000000000000000000000000000000"));
+        raw.getOutputStream().flush();
+        raw.getOutputStream().close();
+        response.status(200);
+        return raw;
     }
 
     @SparkGet("/account/dashboard/ticket/show/:id")
@@ -67,7 +88,6 @@ public class UserPanelController {
                 final User u = DbConnect.getDatabase().sql("SELECT * FROM `users` WHERE `id` = ?", request.cookie("uuid")).first(User.class);
                 model.put("user", u);
                 model.put("ticket", DbConnect.getDatabase().sql("SELECT * FROM `tickets` WHERE `id` = ?", id).first(Ticket.class));
-                model.put("avatar", "https://www.gravatar.com/avatar/" + MD5Util.md5Hex(u.getEmail()));
                 model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
                 return new VelocityTemplateEngine().render(
                         new ModelAndView(model, "private/account-userpanel-ticket.ftl")
@@ -94,7 +114,6 @@ public class UserPanelController {
                 final User u = DbConnect.getDatabase().sql("SELECT * FROM `users` WHERE `id` = ?", request.cookie("uuid")).first(User.class);
                 model.put("user", u);
                 model.put("tickets", ParginationUtils.getPage(DbConnect.getDatabase().sql("SELECT * FROM `tickets` WHERE `user_id` = ?", request.cookie("uuid")).results(Ticket.class), Integer.parseInt(id), 10));
-                model.put("avatar", "https://www.gravatar.com/avatar/" + MD5Util.md5Hex(u.getEmail()));
                 model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
                 return new VelocityTemplateEngine().render(
                         new ModelAndView(model, "private/account-userpanel-ticketlist.ftl")
@@ -117,7 +136,6 @@ public class UserPanelController {
                 final Map<String, Object> model = new HashMap<>();
                 final User u = DbConnect.getDatabase().sql("SELECT * FROM `users` WHERE `id` = ?", request.cookie("uuid")).first(User.class);
                 model.put("user", u);
-                model.put("avatar", "https://www.gravatar.com/avatar/" + MD5Util.md5Hex(u.getEmail()));
                 model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
                 return new VelocityTemplateEngine().render(
                         new ModelAndView(model, "private/account-userpanel-ticketcreate.ftl")
@@ -140,7 +158,6 @@ public class UserPanelController {
                 final User u = DbConnect.getDatabase().sql("SELECT * FROM `users` WHERE `id` = ?", request.cookie("uuid")).first(User.class);
                 model.put("user", u);
                 model.put("actions", DbConnect.getDatabase().sql("SELECT * FROM `actions` WHERE `user_id` = ? ORDER BY `id` DESC LIMIT 5", request.cookie("uuid")).results(Action.class));
-                model.put("avatar", "https://www.gravatar.com/avatar/" + MD5Util.md5Hex(u.getEmail()));
                 model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
                 return new VelocityTemplateEngine().render(
                         new ModelAndView(model, "private/account-userpanel.ftl")

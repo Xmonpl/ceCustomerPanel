@@ -70,7 +70,7 @@
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">
                     <div class="user-avatar">
-                        <img src='$avatar' alt="John Doe">
+                        <img src='/api/avatar/$u.getUUID()' alt="John Doe">
                     </div>
                     <span>$user.full_name</span>
                 </a>
@@ -105,7 +105,7 @@
         <aside class="menu">
             <div class="columns is-mobile">
                 <div class="column is-half is-offset-one-quarter">
-                    <img class="image is-128x128" src='$avatar' alt="John Doe">
+                    <img class="image is-128x128" src='/api/avatar/$u.getUUID()' alt="John Doe">
                     <p>$user.full_name</p>
                     <p>$user.email</p>
                     <span class="tag is-rounded is-success ml-3">Portfel: $user.balance</span>

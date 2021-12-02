@@ -70,7 +70,7 @@
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">
                     <div class="user-avatar">
-                        <img src='$avatar' alt="John Doe">
+                        <img src='/api/avatar/$user.getUUID()' alt="John Doe">
                     </div>
                     <span>$user.full_name</span>
                 </a>
@@ -105,7 +105,7 @@
         <aside class="menu">
             <div class="columns is-mobile">
                 <div class="column is-half is-offset-one-quarter">
-                    <img class="image is-128x128" src='$avatar' alt="John Doe">
+                    <img class="image is-128x128" src='/api/avatar/$user.getUUID()' alt="John Doe">
                     <p>$user.full_name</p>
                     <p>$user.email</p>
                     <span class="tag is-rounded is-success ml-3">Portfel: $user.balance</span>
@@ -153,63 +153,116 @@
     </div>
     <div class="column">
         <div class="container pt-6">
-            <h1 class="title">Zgłoszenie - $ticket.getId() <span class='closed-$ticket.closed'></span></h1>
-            <h3>Tytuł: $ticket.topic</h3>
-            <div class="columns">
-                <div class="column">
-                    #foreach( $message in $ticket.getMessages() )
-                    #if( $ticket.user_id !=  $message.author)
-                    <div class="box my-6">
-                        <p class="is-italic has-text-right">$message.created</p><br />
-                        <p class="has-text-left">$message.message</p>
-                    </div>
-                    #else
-                    <div class="my-6"></div>
-                    #end
-                    #end
-                </div>
-                <div class="column"></div>
-                <div class="column">
+            <div class="box">
+                <h1 class="title">Zgłoszenie - $ticket.getId() <span class='closed-$ticket.closed'></span></h1>
+                <h3 class="title is-4 has-text-centered">Tytuł: $ticket.topic</h3>
+                <div style="width: 100%; max-height: 600px; overflow-y:scroll;" id="messages">
+                    <hr>
                     #foreach( $message in $ticket.getMessages() )
                     #if( $ticket.user_id ==  $message.author)
-                    <div class="box my-6">
-                        <p class="is-italic has-text-right">$message.created</p><br />
-                        <p class="has-text-left">$message.message</p>
-                    </div>
+                    <p style="padding: 0.25em; text-align: right;">
+                        <img class="image is-32x32" src="/api/avatar/$ticket.user_id" style="display: inline-block; border-radius: 50%; top:10px;">
+                        <span class="tag is-medium is-info" style="word-break: break-all;white-space: normal;">$message.message</span>
+                    </p>
                     #else
-                    <div class="my-6"></div>
+                    <p style="padding: 0.25em; text-align: left; ">
+                        <img class="image is-32x32" src="/api/avatar/$ticket.user_id" style="display: inline-block; border-radius: 50%; top:10px;">
+                        <span class="tag is-medium is-success" style="word-break: break-all;white-space: normal;">$message.message</span>
+                    </p>
                     #end
                     #end
                 </div>
+                <form class="mt-4" id="new-message">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            #if( $ticket.closed == 0 )
+                                <input type="text" class="input" id="ticket-message-new" placeholder="Napisz swój problem"></div>
+                                <div class="control">
+                                    <button class="button is-info">Wyślij</button>
+                                </div>
+                            #else
+                                <input type="text" class="input" id="ticket-message-new" placeholder="Napisz swój problem" disabled></div>
+                                <div class="control">
+                                    <button class="button is-info" disabled>Wyślij</button>
+                                </div>
+                            #end
+
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 $footer
 <script>
+    let last_update = 10;
     $(document).ready(function() {
-        $('#previous').attr("href", getPreviousPage());
-        $('#next').attr("href", getNextPage());
-        $('#current').text(getCurrentPage());
         $('.closed-0').append('<i class="fas fa-unlock" style="color: green;"></i>');
         $('.closed-1').append('<i class="fas fa-lock" style="color: red;"></i>');
+        updateScroll();
+        $( "#new-message" ).submit(async function (e) {
+            e.preventDefault();
+            $.ajax({
+                method: "POST",
+                url: "http://localhost/api/ticket/addmessage",
+                data: {"ticketid": '$ticket.getId()', "message": document.getElementById("ticket-message-new").value}
+            }).done(function (response) {
+                var returnedData = JSON.parse(response);
+                if (returnedData['status'] === 'OK') {
+                    updateMessages();
+                    $('#ticket-message-new').val('');
+                    updateScroll();
+                }else{
+                    $('#modals').empty();
+                    $('#modals').append("<div class=\"modal is-active\">" +
+                        "        <div class=\"modal-background\"></div>" +
+                        "        <div class=\"modal-card\">" +
+                        "            <header class=\"modal-card-head\">" +
+                        "                <p class=\"modal-card-title\">Bład przy wysłaniu wiadomości!</p>" +
+                        "                <button class=\"delete\" aria-label=\"close\" onclick=\"$('#modals').empty()\"></button>" +
+                        "            </header>" +
+                        "            <section class=\"modal-card-body\">" +
+                        "                <p><strong>Wiadomość nie może być pusta</strong> </p>" +
+                        "                <p><strong>DEV-MESSAGE: " + returnedData['message'] + "</strong> </p>" +
+                        "            </section>" +
+                        "        </div>" +
+                        "    </div>")
+                }
+            });
+        });
+        setInterval(function(){
+            if (last_update <= 0){
+                updateMessages();
+                last_update = 10;
+            }else{
+                last_update--;
+            }
+        }, 1000);
     });
-    function getCurrentPage(){
-        return window.location.pathname.split("/")[5];
+
+    function updateScroll(){
+        $("#messages").animate({ scrollTop: $(document).height() *5 }, "slow");
+        return false;
     }
 
-    function getPreviousPage(){
-        const path = window.location.pathname.split("/");
-        const page = (parseInt(path[5]) - 1);
-        if (page <= 0){
-            return "/account/dashboard/ticket/list/1";
-        }else{
-            return "/account/dashboard/ticket/list/" + page;
-        }
-    }
-    function getNextPage(){
-        const path = window.location.pathname.split("/");
-        const page = (parseInt(path[5]) + 1);
-        return "/account/dashboard/ticket/list/" + page;
+    function updateMessages(){
+        $.ajax({
+            method:"POST",
+            url: "http://localhost/api/ticket/getmessages",
+            data: {"ticketid": '$ticket.getId()'}
+        }).done(function(response){
+            var returnedData = JSON.parse(response);
+            if (returnedData['status'] === 'OK') {
+                $('#messages').empty();
+                $('#messages').append("<hr>");
+                $.each(returnedData['data'], function(index, value){
+                    if(value['author'] === '$user.getUUID()'){
+                        $('#messages').append("<p style='padding: 0.25em; text-align: right; overflow-wrap: normal;'> <img class='image is-32x32' src='/api/avatar/" + value['author'] + "' style='display: inline-block; border-radius: 50%; top:10px;'> <span class='tag is-medium is-info'>" + value['message'] + "</span></p>");
+                    }else{
+                        $('#messages').append("<p style='padding: 0.25em; text-align: left; overflow-wrap: normal;'> <img class='image is-32x32' src='/api/avatar/" + value['author'] + "' style='display: inline-block; border-radius: 50%; top:10px;'> <span class='tag is-medium is-success'>" + value['message'] + "</span></p>");
+                    }
+                });
+            }
+        });
     }
 </script>

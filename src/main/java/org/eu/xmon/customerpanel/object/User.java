@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
 
@@ -44,6 +45,11 @@ public class User implements Serializable {
 
     @Column(name = "balance")
     private double balance;
+
+    @Transient
+    public String getUUID(){
+        return id;
+    }
 
    /*@Column(name = "actions")
     @DbSerializer(JSONSerializer.class)

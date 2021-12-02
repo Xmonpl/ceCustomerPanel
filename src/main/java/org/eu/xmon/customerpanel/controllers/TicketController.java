@@ -22,6 +22,52 @@ import java.util.UUID;
 
 @SparkController
 public class TicketController {
+    @SparkPost("/api/ticket/getmessages")
+    public String getMessages(@SparkQueryParam("ticketid") final String ticket$id, final Request request, final Response response){
+        if (request.cookie("uuid") != null && request.cookie("token") != null) {
+            final BCrypt.Result result = BCrypt.verifyer().verify((request.cookie("uuid") + "-" + request.ip()).toCharArray(), request.cookie("token"));
+            if (result.verified) {
+                if (ticket$id != null){
+                    final Ticket ticket = DbConnect.getDatabase().sql("SELECT * FROM `tickets` WHERE id = ?", ticket$id).first(Ticket.class);
+                    if (ticket != null) {
+                        return new Gson().toJson(StandardResponse.builder().status(StatusResponse.OK).data(new Gson().toJsonTree(ticket.getMessages())).build());
+                    }else{
+                        return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("invalid ticket id").build());
+                    }
+                }else{
+                    return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Bad implementation").build());
+                }
+            }
+        }
+        return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Non logged").build());
+    }
+
+    @SparkPost("/api/ticket/addmessage")
+    public String newMessageTicket(@SparkQueryParam("message") final String message, @SparkQueryParam("ticketid") final String ticket$id, final Request request, final Response response){
+        if (request.cookie("uuid") != null && request.cookie("token") != null){
+            final BCrypt.Result result = BCrypt.verifyer().verify((request.cookie("uuid") + "-" + request.ip()).toCharArray(), request.cookie("token"));
+            if (result.verified){
+                if (message != null && ticket$id != null && !message.isEmpty() && !message.isBlank()){
+                    final Ticket ticket = DbConnect.getDatabase().sql("SELECT * FROM `tickets` WHERE id = ?", ticket$id).first(Ticket.class);
+                    if (ticket != null) {
+                        final TicketMessage ticketMessage = TicketMessage.builder()
+                                .message(message)
+                                .author(request.cookie("uuid"))
+                                .created(OtherUtils.getFormatter().format(new Date()))
+                                .build();
+                        ticket.getMessages().add(ticketMessage);
+                        DbConnect.getDatabase().update(ticket);
+                        return new Gson().toJson(StandardResponse.builder().status(StatusResponse.OK).message("Ticket Message Created!").build());
+                    }else{
+                        return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("invalid ticket id").build());
+                    }
+                }else{
+                    return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Bad implementation").build());
+                }
+            }
+        }
+        return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Non logged").build());
+    }
     @SparkPost("/api/ticket/create")
     public String createTicket(@SparkQueryParam("topic") final String topic, @SparkQueryParam("message") final String message, @SparkQueryParam("priority") final String priority, final Request request, final Response response){
         if (request.cookie("uuid") != null && request.cookie("token") != null){

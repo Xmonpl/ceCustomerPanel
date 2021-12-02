@@ -91,8 +91,8 @@ public class RegisterController {
                         .build();
         DatabaseUtils.insert(user);
         DatabaseUtils.insert(register$action);
-        res.cookie("/", "token", BCrypt.withDefaults().hashToString(4, (user.id + "-" + req.ip()).toCharArray()), 3600,false, true);
-        res.cookie("/", "uuid", user.id, 3600,false, true);
+        res.cookie("/", "token", BCrypt.withDefaults().hashToString(4, (user.id + "-" + req.ip()).toCharArray()), 36000,false, true);
+        res.cookie("/", "uuid", user.id, 36000,false, true);
         System.out.println("[+] New User - " + user.toString());
         return new Gson().toJson(StandardResponse.builder().status(StatusResponse.OK).message("User created successfuly!").build());
     }
