@@ -3,8 +3,13 @@ package org.eu.xmon.customerpanel.controllers;
 import com.ftpix.sparknnotation.annotations.SparkController;
 import com.ftpix.sparknnotation.annotations.SparkGet;
 import com.ftpix.sparknnotation.annotations.SparkPost;
+import com.google.gson.JsonSyntaxException;
 import com.stripe.Stripe;
+import com.stripe.exception.SignatureVerificationException;
+import com.stripe.model.*;
 import com.stripe.model.checkout.Session;
+import com.stripe.net.ApiResource;
+import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.SneakyThrows;
 import spark.Request;
@@ -12,6 +17,39 @@ import spark.Response;
 
 @SparkController
 public class TestController {
+    private static final String endpointSecret = "whsec_mKjkx3s6lyZmf7qW62rR97W8qIuWjtjW";
+
+    @SparkPost("/webhook")
+    public Object handle(final Request request, final Response response){
+        String payload = request.body();
+        String sigHeader = request.headers("Stripe-Signature");
+        Event event = null;
+        try {
+            event = Webhook.constructEvent(
+                    payload, sigHeader, endpointSecret
+            );
+        } catch (JsonSyntaxException e) {
+            response.status(400);
+            return "";
+        } catch (SignatureVerificationException e) {
+            response.status(400);
+            return "";
+        }
+        EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
+        StripeObject stripeObject = null;
+        if (dataObjectDeserializer.getObject().isPresent()) {
+            stripeObject = dataObjectDeserializer.getObject().get();
+        }
+        switch (event.getType()) {
+            case "payment_intent.succeeded": {
+                System.out.println(stripeObject.toString());
+                break;
+            }
+        }
+        response.status(200);
+        return "";
+    }
+
     @SparkGet("/success")
     public String success(final Request request, final Response response){
         return "Udało się";

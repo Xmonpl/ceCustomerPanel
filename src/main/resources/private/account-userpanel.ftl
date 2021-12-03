@@ -152,6 +152,26 @@
                 </li>
                 <li><a href="/account/dashboard/actions/1">Wydarzenia konta</a></li>
             </ul>
+            #if ( $user.role == "ADMIN" || $user.role == "MODERATOR")
+            <p class="menu-label">
+                Narzędzia administratorskie
+            </p>
+            <ul class="menu-list">
+                <li><a>Baza użytkowników</a></li>
+                <li><a>Baza zgłoszeń</a></li>
+                <li><a>Płatności</a></li>
+                <li><a>Kody rabatowe</a></li>
+                <li>
+                    <a>Usługi</a>
+                    <ul>
+                        <li><a>Dodaj niestandardową usługe</a></li>
+                        <li><a>Usuń usługe niestandardową</a></li>
+                        <li><a>Dodaj ogólnodostępną usługe</a></li>
+                        <li><a>Usuń usługe ogólnodostępną</a></li>
+                    </ul>
+                </li>
+            </ul>
+            #end
         </aside>
     </div>
     <div class="column">

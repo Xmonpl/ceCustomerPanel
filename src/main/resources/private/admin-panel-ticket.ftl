@@ -149,6 +149,26 @@
                 </li>
                 <li><a href="/account/dashboard/actions/1">Wydarzenia konta</a></li>
             </ul>
+            #if ( $user.role == "ADMIN" || $user.role == "MODERATOR")
+            <p class="menu-label">
+                Narzędzia administratorskie
+            </p>
+            <ul class="menu-list">
+                <li><a>Baza użytkowników</a></li>
+                <li><a>Baza zgłoszeń</a></li>
+                <li><a>Płatności</a></li>
+                <li><a>Kody rabatowe</a></li>
+                <li>
+                    <a>Usługi</a>
+                    <ul>
+                        <li><a>Dodaj niestandardową usługe</a></li>
+                        <li><a>Usuń usługe niestandardową</a></li>
+                        <li><a>Dodaj ogólnodostępną usługe</a></li>
+                        <li><a>Usuń usługe ogólnodostępną</a></li>
+                    </ul>
+                </li>
+            </ul>
+            #end
         </aside>
     </div>
     <div class="column">
@@ -156,6 +176,10 @@
             <div class="box">
                 <h1 class="title">Zgłoszenie - $ticket.getId() <span class='closed-$ticket.closed'></span></h1>
                 <h3 class="title is-4 has-text-centered">Tytuł: $ticket.topic</h3>
+                <div class="buttons is-centered mt-4">
+                    <button class="button is-link is-rounded" onclick="close()">Zamknij/otwórz ticket</button>
+                    <a class="button is-link is-rounded" href="/account/adminpanel/user/$ticket.user_id">Profil zgłaszającego</a>
+                </div>
                 <div style="width: 100%; max-height: 600px; overflow-y:scroll;" id="messages">
                     <hr>
                     #foreach( $message in $ticket.getMessages() )
@@ -175,18 +199,10 @@
                 <form class="mt-4" id="new-message">
                     <div class="field has-addons">
                         <div class="control is-expanded">
-                            #if( $ticket.closed == 0 )
-                                <input type="text" class="input" id="ticket-message-new" placeholder="Napisz swój problem"></div>
-                                <div class="control">
-                                    <button class="button is-info">Wyślij</button>
-                                </div>
-                            #else
-                                <input type="text" class="input" id="ticket-message-new" placeholder="Napisz swój problem" disabled></div>
-                                <div class="control">
-                                    <button class="button is-info" disabled>Wyślij</button>
-                                </div>
-                            #end
-
+                            <input type="text" class="input" id="ticket-message-new" placeholder="Napisz swój problem"></div>
+                        <div class="control">
+                            <button class="button is-info">Wyślij</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -195,6 +211,15 @@
 </div>
 $footer
 <script>
+    function close(){
+        $.ajax({
+            method: "POST",
+            url: "http://localhost/api/ticket/close",
+            data: {'ticketid': '$ticket.getId()'}
+        }).done(function (response) {
+            window.location.reload(false);
+        });
+    }
     let last_update = 5;
     $(document).ready(function() {
         $('.closed-0').append('<i class="fas fa-unlock" style="color: green;"></i>');

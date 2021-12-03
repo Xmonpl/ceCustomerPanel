@@ -73,7 +73,7 @@ public class LoginController {
             DatabaseUtils.insert(login$failed$atempt);
             return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("The email or password is incorrect or the account has not been activated").build());
         }
-        if (user.getLast_ip().equals("-")){
+        if (user.getIp_last().equals("-")){
             final Action register$success$action = Action.builder()
                     .actionStatus(ActionStatus.REGISTRATION_COMPLETED.message)
                     .ip(req.ip())
@@ -83,7 +83,7 @@ public class LoginController {
                     .build();
             DatabaseUtils.insert(register$success$action);
         }
-        user.setLast_ip(req.ip());
+        user.setIp_last(req.ip());
         DatabaseUtils.update(user);
         final Action login$success = Action.builder()
                 .actionStatus(ActionStatus.LOGGED_IN.message)

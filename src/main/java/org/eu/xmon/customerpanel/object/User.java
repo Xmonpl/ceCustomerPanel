@@ -3,10 +3,7 @@ package org.eu.xmon.customerpanel.object;
 import com.dieselpoint.norm.serialize.DbSerializer;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -19,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "users")
-public class User implements Serializable {
+public class User{
     @Id
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
@@ -37,24 +34,22 @@ public class User implements Serializable {
     @Column(name = "create_time")
     private String create_time;
 
-    @Column(name = "first_ip")
-    private String first_ip;
+    @Column(name = "ip_first")
+    private String ip_first;
 
-    @Column(name = "last_ip")
-    private String last_ip;
+    @Column(name = "ip_last")
+    private String ip_last;
 
     @Column(name = "balance")
     private double balance;
+
+    @Column(name = "role")
+    private String role;
 
     @Transient
     public String getUUID(){
         return id;
     }
-
-   /*@Column(name = "actions")
-    @DbSerializer(JSONSerializer.class)
-    private List<String> actions;
-    */
 
 
 }

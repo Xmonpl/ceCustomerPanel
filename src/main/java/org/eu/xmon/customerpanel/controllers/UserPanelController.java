@@ -156,12 +156,17 @@ public class UserPanelController {
             if (result.verified){
                 final Map<String, Object> model = new HashMap<>();
                 final User u = DbConnect.getDatabase().sql("SELECT * FROM `users` WHERE `id` = ?", request.cookie("uuid")).first(User.class);
-                model.put("user", u);
-                model.put("actions", DbConnect.getDatabase().sql("SELECT * FROM `actions` WHERE `user_id` = ? ORDER BY `id` DESC LIMIT 5", request.cookie("uuid")).results(Action.class));
-                model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
-                return new VelocityTemplateEngine().render(
-                        new ModelAndView(model, "private/account-userpanel.ftl")
-                );
+                if (u != null) {
+                    model.put("user", u);
+                    model.put("actions", DbConnect.getDatabase().sql("SELECT * FROM `actions` WHERE `user_id` = ? ORDER BY `id` DESC LIMIT 5", request.cookie("uuid")).results(Action.class));
+                    model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
+                    return new VelocityTemplateEngine().render(
+                            new ModelAndView(model, "private/account-userpanel.ftl")
+                    );
+                }else{
+                    response.redirect("/account/dashboard/logout");
+                    return "";
+                }
             }else{
                 response.redirect("/account/login");
                 return "";
