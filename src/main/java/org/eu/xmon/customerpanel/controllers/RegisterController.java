@@ -10,6 +10,7 @@ import org.eu.xmon.customerpanel.database.DbConnect;
 import org.eu.xmon.customerpanel.object.Action;
 import org.eu.xmon.customerpanel.object.ActionStatus;
 import org.eu.xmon.customerpanel.object.User;
+import org.eu.xmon.customerpanel.object.UserBan;
 import org.eu.xmon.customerpanel.response.StandardResponse;
 import org.eu.xmon.customerpanel.response.StatusResponse;
 import org.eu.xmon.customerpanel.utils.DatabaseUtils;
@@ -20,6 +21,7 @@ import spark.Request;
 import spark.Response;
 import spark.template.velocity.VelocityTemplateEngine;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,6 +82,8 @@ public class RegisterController {
                 .ip_last("-")
                 .role("USER")
                 .balance(0.0)
+                .active(1)
+                .ban(UserBan.builder().who("-").reason("-").until_when(new Timestamp(System.currentTimeMillis()).getTime()).build())
                 .full_name(fullname)
                 .password(BCrypt.withDefaults().hashToString(8, password.toCharArray()))
                 .build();

@@ -20,6 +20,7 @@ import spark.Request;
 import spark.Response;
 import spark.template.velocity.VelocityTemplateEngine;
 
+import java.sql.Timestamp;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,6 +73,14 @@ public class LoginController {
                     .build();
             DatabaseUtils.insert(login$failed$atempt);
             return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("The email or password is incorrect or the account has not been activated").build());
+        }
+        if (user.getActive() == 0){
+            return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Your account is inactive!").build());
+        }
+        if (!user.ban.getWho().equals("-") && !user.ban.getReason().equals("-")){
+            if (new Timestamp(user.ban.getUntil_when()).compareTo(new Timestamp(System.currentTimeMillis())) > 0) {
+                return new Gson().toJson(StandardResponse.builder().status(StatusResponse.ERROR).message("Your account has been blocked due to " + user.ban.getReason() + "<br>The blockade will last until " + new Timestamp(user.ban.getUntil_when()).toString()).build());
+            }
         }
         if (user.getIp_last().equals("-")){
             final Action register$success$action = Action.builder()

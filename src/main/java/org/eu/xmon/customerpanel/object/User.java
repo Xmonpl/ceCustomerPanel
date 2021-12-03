@@ -2,6 +2,7 @@ package org.eu.xmon.customerpanel.object;
 
 import com.dieselpoint.norm.serialize.DbSerializer;
 import lombok.*;
+import org.eu.xmon.customerpanel.converters.UserBanConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -45,6 +46,15 @@ public class User{
 
     @Column(name = "role")
     private String role;
+
+    @Column(name = "active")
+    private int active;
+
+    @Column(name = "ban")
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @Convert(converter = UserBanConverter.class)
+    public UserBan ban;
 
     @Transient
     public String getUUID(){
