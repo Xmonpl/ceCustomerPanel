@@ -22,6 +22,38 @@ import java.util.Map;
 
 @SparkController
 public class AdminPanelController {
+    @SparkGet("/account/adminpanel/user/:id")
+    public String getUser(@SparkParam("id") final String id, final Request request, final Response response){
+        if (request.cookie("uuid") != null && request.cookie("token") != null ) {
+            if (id == null || !OtherUtils.isStringUUID(id)){
+                return "upsi";
+            }
+            final BCrypt.Result result = BCrypt.verifyer().verify((request.cookie("uuid") + "-" + request.ip()).toCharArray(), request.cookie("token"));
+            if (result.verified) {
+                final Map<String, Object> model = new HashMap<>();
+                final User u = DbConnect.getDatabase().sql("SELECT * FROM `users` WHERE `id` = ?", request.cookie("uuid")).first(User.class);
+                if (u != null && u.getRole().equals("ADMIN")) {
+                    model.put("user", u);
+                    model.put("tu", DbConnect.getDatabase().sql("SELECT * FROM `users` WHERE `id` = ?", id).first(User.class));
+                    model.put("actions", DbConnect.getDatabase().sql("SELECT * FROM `actions` WHERE `user_id` = ? ORDER BY `id` DESC LIMIT 5", id).results(Action.class));
+                    model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
+                    return new VelocityTemplateEngine().render(
+                            new ModelAndView(model, "private/admin-panel-user.ftl")
+                    );
+                }else{
+                    response.redirect("/account/dashboard");
+                    return "";
+                }
+            }else{
+                response.redirect("/account/login");
+                return "";
+            }
+        }else{
+            response.redirect("/account/register");
+            return "";
+        }
+    }
+
     @SparkGet("/account/adminpanel/ticket/:id")
     public String ticketGet(@SparkParam("id") final String id, final Request request, final Response response){
         if (request.cookie("uuid") != null && request.cookie("token") != null ) {
@@ -32,12 +64,17 @@ public class AdminPanelController {
             if (result.verified) {
                 final Map<String, Object> model = new HashMap<>();
                 final User u = DbConnect.getDatabase().sql("SELECT * FROM `users` WHERE `id` = ?", request.cookie("uuid")).first(User.class);
-                model.put("user", u);
-                model.put("ticket", DbConnect.getDatabase().sql("SELECT * FROM `tickets` WHERE `id` = ?", id).first(Ticket.class));
-                model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
-                return new VelocityTemplateEngine().render(
-                        new ModelAndView(model, "private/admin-panel-ticket.ftl")
-                );
+                if (u != null && u.getRole().equals("ADMIN")) {
+                    model.put("user", u);
+                    model.put("ticket", DbConnect.getDatabase().sql("SELECT * FROM `tickets` WHERE `id` = ?", id).first(Ticket.class));
+                    model.put("footer", MvnController.getMvc(MvcEnum.FOOTER));
+                    return new VelocityTemplateEngine().render(
+                            new ModelAndView(model, "private/admin-panel-ticket.ftl")
+                    );
+                }else{
+                    response.redirect("/account/dashboard");
+                    return "";
+                }
             }else{
                 response.redirect("/account/login");
                 return "";

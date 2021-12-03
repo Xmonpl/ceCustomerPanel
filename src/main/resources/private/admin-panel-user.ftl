@@ -143,8 +143,8 @@
                 <li>
                     <a>Zgłoszenia</a>
                     <ul>
-                        <li><a class="is-active" href="/account/dashboard/ticket/new">Utwórz zgłoszenie</a></li>
-                        <li><a href="/account/dashboard/ticket/list/1" >Lista zgłoszeń</a></li>
+                        <li><a href="/account/dashboard/ticket/new">Utwórz zgłoszenie</a></li>
+                        <li><a class="is-active" href="/account/dashboard/ticket/list/1">Lista zgłoszeń</a></li>
                     </ul>
                 </li>
                 <li><a href="/account/dashboard/actions/1">Wydarzenia konta</a></li>
@@ -173,85 +173,79 @@
     </div>
     <div class="column">
         <div class="container pt-6">
-            <div class="box">
-                <ul>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>UUID</th>
-                                <th>Email</th>
-                                <th>Full Name</th>
-                                <th>Created Time</th>
-                                <th>IP First</th>
-                                <th>IP Last</th>
-                                <th>Balance</th>
-                                <th>Role</th>
-                                <th>Manage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            #if( $users.isEmpty() )
-                                <tr>
-                                    <th>0</th>
-                                    <th>0</th>
-                                    <th>0</th>
-                                    <th>0</th>
-                                    <th>0</th>
-                                    <th>0</th>
-                                    <th>0</th>
-                                    <th>0</th>
-                                    <th>0</th>
-                                </tr>
-                            #else
-                                #foreach( $u in $users )
-                                <tr>
-                                    <th>$u.getUUID()</th>
-                                    <th>$u.email</th>
-                                    <th>$u.full_name</th>
-                                    <th>$u.create_time</th>
-                                    <th>$u.ip_first</th>
-                                    <th>$u.ip_last</th>
-                                    <th>$u.balance</th>
-                                    <th>$u.role</th>
-                                    <th><a href='/account/adminpanel/user/$u.getUUID()'>Manage</a></th>
-                                </tr>
-                                #end
-                            #end
-                        </tbody>
-                    </table>
-                    <div class="buttons is-centered mt-4">
-                        <a class="button is-link is-rounded" id="previous"><- Poprzednia strona</a>
-                        <a class="button is-link is-rounded" id="current" disabled></a>
-                        <a class="button is-link is-rounded" id="next" >Następna strona -></a>
+            <div class="columns">
+                <div class="column">
+                    <div class="box">
+                        <h2 class="title">Dane o użytkowniku:</h2>
+                        <p>UUID: <strong>$tu.getUUID()</strong></p>
+                        <p>E-mail: <strong>$tu.email</strong></p>
+                        <p>Imię i Nazwisko: <strong>$tu.full_name</strong></p>
+                        <p>Data utworzenia: <strong>$tu.create_time</strong></p>
+                        <p>Adres IP przy rejestracji: <strong>$tu.ip_first</strong></p>
+                        <p>Adres IP przy ostatnim zalogowaniu: <strong>$tu.ip_last</strong></p>
+                        <p>Stan Konta: <strong>$tu.balance</strong></p>
+                        <p>Rola: <strong>$tu.role</strong></p>
+                        <p>Aktywne: <strong>$tu.active</strong></p>
+                        <p>Ostatnie Blokady: </p>
+                        <p>* Powód: $tu.getBan().reason </p>
+                        <p>* Kto nadał: $tu.getBan().who </p>
+                        <p>* Do kiedy: <strong onload="toHuman('$tu.getBan().until_when');"></strong> </p>
                     </div>
-                </ul>
+                </div>
+                <div class="column">
+                    <div class="box">
+                        <h2 class="title">Ostatnie Akcje Użytkownika:</h2>
+                        #foreach( $action in $actions )
+                        <li class="box mb-1">$action.timestamp - $action.actionStatus (IP: $action.ip) <a class="is-pulled-right" onclick="loadAction(${action.gettwojastara()})" >Więcej</a></li>
+                        #end
+                    </div>
+                </div>
             </div>
+            <div class="columns">
+                <div class="column">
+                    <div class="box">
+                        <div class="buttons">
+                            <a class="button is-link is-rounded">Zablokuj użytkownika</a>
+                            <a class="button is-link is-rounded">Zdeaktywuj konto</a>
+                            <a class="button is-link is-rounded">Usuń konto</a>
+                            <a class="button is-link is-rounded">Dodaj lub usuń usługę</a>
+                            <a class="button is-link is-rounded">Zedytuj saldo konta</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="box">
+                        Tutaj będą rzeczy z płatnościami XD
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 $footer
 <script>
-    $(document).ready(function() {
-        $('#previous').attr("href", getPreviousPage());
-        $('#next').attr("href", getNextPage());
-        $('#current').text(getCurrentPage());
-    });
-    function getCurrentPage(){
-        return window.location.pathname.split("/")[4];
+    function toHuman(UNIX_timestamp){
+        var a = new Date(UNIX_timestamp * 1000);
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var year = a.getFullYear();
+        var month = months[a.getMonth()];
+        var date = a.getDate();
+        var hour = a.getHours();
+        var min = a.getMinutes();
+        var sec = a.getSeconds();
+        var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+        return time;
     }
-
-    function getPreviousPage(){
-        const path = window.location.pathname.split("/");
-        const page = (parseInt(path[4]) - 1);
-        if (page <= 0){
-            return "/account/adminpanel/users/1";
-        }else{
-            return "/account/adminpanel/users/" + page;
-        }
-    }
-    function getNextPage(){
-        const path = window.location.pathname.split("/");
-        const page = (parseInt(path[4]) + 1);
-        return "/account/adminpanel/users/" + page;
+    function loadAction(id){
+        $('#modals').empty();
+        $.ajax({
+            method:"POST",
+            url: "http://localhost/api/action/flat",
+            data: {"id": id}
+        }).done(function(response){
+            $('#modals').empty();
+            $('#modals').append(response);
+        });
     }
 </script>

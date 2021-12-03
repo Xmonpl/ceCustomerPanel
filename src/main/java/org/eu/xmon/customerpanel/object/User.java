@@ -61,5 +61,10 @@ public class User{
         return id;
     }
 
+    @Transient
+    public UserBan getBan(){
+        return ban;
+    }
+
 
 }
